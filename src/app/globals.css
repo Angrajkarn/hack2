@@ -1,0 +1,298 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap');
+
+/* ============================================================
+   ANTIGRAVITY DESIGN SYSTEM — TAILWIND V4 / "VOID" DARK THEME
+   ============================================================ */
+
+@theme {
+  /* Brand Color Tokens (used as text-primary, bg-emergency, etc.) */
+  --color-primary: #00d4ff;
+  --color-violet:  #9d5cff;
+  --color-emergency: #ff3d5a;
+  --color-warning:   #ffb830;
+  --color-success:   #00e5a0;
+
+  /* Void Surface Palette */
+  --color-void-black:   #050507;
+  --color-void-deep:    #080810;
+  --color-void-surface: #0d0d15;
+  --color-void-elevated:#12121f;
+  --color-void-card:    #161624;
+
+  /* Font Families */
+  --font-family-sans:    'Inter', system-ui, sans-serif;
+  --font-family-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-family-mono:    'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* ============================================================
+   CSS CUSTOM PROPERTIES (for classes not covered by @theme)
+   ============================================================ */
+
+:root {
+  --primary-dim:      rgba(0, 212, 255, 0.12);
+  --primary-glow:     rgba(0, 212, 255, 0.35);
+  --violet-dim:       rgba(157, 92, 255, 0.12);
+  --emergency-dim:    rgba(255, 61, 90, 0.12);
+  --emergency-glow:   rgba(255, 61, 90, 0.4);
+  --warning-dim:      rgba(255, 184, 48, 0.12);
+  --warning-glow:     rgba(255, 184, 48, 0.35);
+  --success-dim:      rgba(0, 229, 160, 0.12);
+  --glass-bg:         rgba(255, 255, 255, 0.04);
+  --glass-border:     rgba(255, 255, 255, 0.08);
+  --glass-blur:       16px;
+}
+
+/* ============================================================
+   BASE RESET & BODY
+   ============================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: #050507;
+  color: rgba(255, 255, 255, 0.88);
+  font-family: 'Inter', system-ui, sans-serif;
+  overflow-x: hidden;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Dynamic grid background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0, 212, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 212, 255, 0.025) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ambient glow orb */
+body::after {
+  content: '';
+  position: fixed;
+  top: -20%;
+  left: -10%;
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(ellipse, rgba(0, 212, 255, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+  animation: orb-drift 20s ease-in-out infinite alternate;
+}
+
+@keyframes orb-drift {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(5%, 5%) scale(1.06); }
+}
+
+/* ============================================================
+   GLASSMORPHISM SYSTEM
+   ============================================================ */
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+  border: 1px solid var(--glass-border);
+}
+
+.glass-primary {
+  background: var(--primary-dim);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.glass-emergency {
+  background: var(--emergency-dim);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid rgba(255, 61, 90, 0.3);
+}
+
+.glass-warning {
+  background: var(--warning-dim);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid rgba(255, 184, 48, 0.3);
+}
+
+/* ============================================================
+   GLOW UTILITIES
+   ============================================================ */
+
+.glow-primary {
+  box-shadow:
+    0 0 0 1px rgba(0, 212, 255, 0.2),
+    0 0 20px rgba(0, 212, 255, 0.15),
+    0 0 40px rgba(0, 212, 255, 0.08);
+}
+
+.glow-emergency {
+  box-shadow:
+    0 0 0 1px rgba(255, 61, 90, 0.3),
+    0 0 20px rgba(255, 61, 90, 0.2),
+    0 0 40px rgba(255, 61, 90, 0.1);
+}
+
+.glow-warning {
+  box-shadow:
+    0 0 0 1px rgba(255, 184, 48, 0.3),
+    0 0 20px rgba(255, 184, 48, 0.15),
+    0 0 40px rgba(255, 184, 48, 0.08);
+}
+
+/* ============================================================
+   SCANLINE EFFECT
+   ============================================================ */
+
+.scanline {
+  position: relative;
+  overflow: hidden;
+}
+
+.scanline::after {
+  content: '';
+  position: absolute;
+  top: -100%;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 212, 255, 0.015) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+  animation: scanline-sweep 8s linear infinite;
+}
+
+@keyframes scanline-sweep {
+  0%   { top: -40%; }
+  100% { top: 140%; }
+}
+
+/* ============================================================
+   WAVEFORM ANIMATION (AI thinking indicator)
+   ============================================================ */
+
+.waveform {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.waveform span {
+  display: inline-block;
+  width: 3px;
+  border-radius: 999px;
+  background: #00d4ff;
+  animation: waveform-bounce 1.2s ease-in-out infinite;
+}
+
+.waveform span:nth-child(1) { animation-delay: 0s; }
+.waveform span:nth-child(2) { animation-delay: 0.15s; }
+.waveform span:nth-child(3) { animation-delay: 0.3s; }
+.waveform span:nth-child(4) { animation-delay: 0.45s; }
+.waveform span:nth-child(5) { animation-delay: 0.6s; }
+
+@keyframes waveform-bounce {
+  0%, 100% { height: 8px;  opacity: 0.4; }
+  50%       { height: 24px; opacity: 1;   }
+}
+
+/* ============================================================
+   PROGRESS BAR
+   ============================================================ */
+
+.progress-bar {
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #00d4ff, #9d5cff);
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.4);
+  transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================================
+   STATUS PULSE ANIMATIONS
+   ============================================================ */
+
+.pulse-critical {
+  animation: pulse-emergency 1.2s ease-in-out infinite;
+}
+
+.pulse-high {
+  animation: pulse-warning 1.8s ease-in-out infinite;
+}
+
+@keyframes pulse-emergency {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(255, 61, 90, 0.5); }
+  50%       { opacity: 0.6; box-shadow: 0 0 20px rgba(255, 61, 90, 0.8); }
+}
+
+@keyframes pulse-warning {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(255, 184, 48, 0.4); }
+  50%       { opacity: 0.7; box-shadow: 0 0 16px rgba(255, 184, 48, 0.7); }
+}
+
+/* ============================================================
+   REVEAL ANIMATIONS
+   ============================================================ */
+
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(16px); filter: blur(4px); }
+  to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
+}
+
+.reveal-up   { animation: reveal-up 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+.reveal-up-1 { animation-delay: 0.05s; opacity: 0; }
+.reveal-up-2 { animation-delay: 0.12s; opacity: 0; }
+.reveal-up-3 { animation-delay: 0.2s;  opacity: 0; }
+.reveal-up-4 { animation-delay: 0.28s; opacity: 0; }
+
+/* ============================================================
+   CUSTOM SCROLLBAR
+   ============================================================ */
+
+.custom-scrollbar::-webkit-scrollbar       { width: 4px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 212, 255, 0.15);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 212, 255, 0.35);
+}
+
+/* ============================================================
+   SELECTION & FOCUS
+   ============================================================ */
+
+::selection {
+  background: rgba(0, 212, 255, 0.25);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid rgba(0, 212, 255, 0.5);
+  outline-offset: 2px;
+}
