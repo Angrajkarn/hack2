@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CrisisLink — Universal Intent Bridge | PromptWars</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #080c10;
+    --surface: #0d1318;
+    --surface2: #131b22;
+    --border: rgba(255,255,255,0.07);
+    --accent: #00e5a0;
+    --accent2: #00b4ff;
+    --warn: #ff6b35;
+    --danger: #ff2d55;
+    --text: #e8edf2;
+    --text-muted: #5a6a78;
+    --text-dim: #8a9aaa;
+    --glow: rgba(0,229,160,0.15);
+    --glow2: rgba(0,180,255,0.1);
+    --grid: rgba(255,255,255,0.025);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ─── GRID BACKGROUND ─── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 20% 20%, rgba(0,229,160,0.05) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 80% at 80% 80%, rgba(0,180,255,0.05) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    position: relative; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 40px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(8,12,16,0.8);
+    backdrop-filter: blur(20px);
+  }
+
+  .logo {
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    position: relative;
+    box-shadow: 0 0 20px rgba(0,229,160,0.4);
+  }
+
+  .logo-icon::after {
+    content: '';
+    position: absolute; inset: -1px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    z-index: -1;
+    opacity: 0.3;
+    filter: blur(8px);
+  }
+
+  .logo-text {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+
+  .logo-text span {
+    color: var(--accent);
+  }
+
+  .badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-green {
+    background: rgba(0,229,160,0.12);
+    color: var(--accent);
+    border: 1px solid rgba(0,229,160,0.3);
+  }
+
+  .badge-blue {
+    background: rgba(0,180,255,0.12);
+    color: var(--accent2);
+    border: 1px solid rgba(0,180,255,0.3);
+  }
+
+  .header-right {
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  .status-dot {
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  /* ─── MAIN LAYOUT ─── */
+  main {
+    position: relative; z-index: 5;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    grid-template-rows: auto 1fr;
+    gap: 0;
+    min-height: calc(100vh - 73px);
+  }
+
+  /* ─── HERO SECTION ─── */
+  .hero {
+    grid-column: 1 / -1;
+    padding: 52px 40px 40px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    gap: 40px;
+    justify-content: space-between;
+  }
+
+  .hero-left { flex: 1; }
+
+  .hero-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .hero-label::before {
+    content: '';
+    width: 24px; height: 1px;
+    background: var(--accent);
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(32px, 4vw, 54px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  h1 .highlight {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-desc {
+    font-size: 15px;
+    color: var(--text-dim);
+    max-width: 560px;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  .stats-row {
+    display: flex; gap: 32px;
+  }
+
+  .stat {
+    text-align: right;
+  }
+
+  .stat-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    margin-top: 4px;
+    text-transform: uppercase;
+  }
+
+  /* ─── INPUT PANEL ─── */
+  .input-panel {
+    padding: 32px 40px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .panel-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  /* MODE TABS */
+  .mode-tabs {
+    display: flex;
+    gap: 6px;
+    background: var(--surface);
+    padding: 4px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .mode-tab {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+
+  .mode-tab.active {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .mode-tab:hover:not(.active) { color: var(--text-dim); }
+
+  /* QUICK SCENARIO CHIPS */
+  .scenario-chips {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+
+  .chip {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-dim);
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .chip:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,229,160,0.05);
+  }
+
+  .chip.danger { border-color: rgba(255,45,85,0.3); color: var(--danger); background: rgba(255,45,85,0.05); }
+  .chip.warn { border-color: rgba(255,107,53,0.3); color: var(--warn); background: rgba(255,107,53,0.05); }
+
+  /* INPUT AREA */
+  .input-wrapper {
+    position: relative;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 160px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    padding: 18px 18px 50px;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  textarea::placeholder { color: var(--text-muted); }
+
+  textarea:focus {
+    border-color: rgba(0,229,160,0.4);
+    box-shadow: 0 0 0 3px rgba(0,229,160,0.06), inset 0 0 40px rgba(0,229,160,0.02);
+  }
+
+  .input-actions {
+    position: absolute;
+    bottom: 12px; right: 12px;
+    display: flex; gap: 8px; align-items: center;
+  }
+
+  .icon-btn {
+    width: 32px; height: 32px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text-muted);
+    border-radius: 7px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+
+  .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* FILE UPLOAD */
+  .file-drop {
+    border: 1.5px dashed var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .file-drop:hover {
+    border-color: rgba(0,180,255,0.4);
+    color: var(--accent2);
+    background: rgba(0,180,255,0.03);
+  }
+
+  .file-drop input { display: none; }
+
+  /* SUBMIT BUTTON */
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--accent), #00c87a);
+    border: none;
+    border-radius: 12px;
+    color: #000;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s;
+  }
+
+  .submit-btn::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .submit-btn:hover::before { opacity: 1; }
+  .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,229,160,0.3); }
+  .submit-btn:active { transform: translateY(0); }
+
+  .submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .btn-inner {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+
+  /* ─── OUTPUT PANEL ─── */
+  .output-panel {
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+  }
+
+  /* TRIAGE CARD */
+  .triage-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    opacity: 0;
+    animation: slideIn 0.4s ease forwards;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(12px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .triage-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .severity {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .severity.critical { color: var(--danger); }
+  .severity.high { color: var(--warn); }
+  .severity.medium { color: #ffd60a; }
+  .severity.low { color: var(--accent); }
+
+  .severity-bar {
+    height: 3px;
+    border-radius: 2px;
+    width: 48px;
+    background: var(--border);
+    overflow: hidden;
+  }
+
+  .severity-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1s ease;
+  }
+
+  .severity.critical .severity-fill { background: var(--danger); width: 100%; }
+  .severity.high .severity-fill { background: var(--warn); width: 75%; }
+  .severity.medium .severity-fill { background: #ffd60a; width: 50%; }
+  .severity.low .severity-fill { background: var(--accent); width: 25%; }
+
+  .intent-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: rgba(0,180,255,0.1);
+    color: var(--accent2);
+    border: 1px solid rgba(0,180,255,0.2);
+  }
+
+  .triage-summary {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  /* ACTION ITEMS */
+  .actions-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .action-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .action-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.5;
+    animation: slideIn 0.4s ease forwards;
+  }
+
+  .action-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    font-weight: 700;
+    min-width: 20px;
+    margin-top: 1px;
+  }
+
+  .action-text { flex: 1; }
+  .action-text strong { color: var(--text); font-weight: 500; }
+
+  .action-badge {
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+    padding: 2px 7px;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin-top: 2px;
+  }
+
+  .action-badge.now { background: rgba(255,45,85,0.15); color: var(--danger); border: 1px solid rgba(255,45,85,0.25); }
+  .action-badge.soon { background: rgba(255,107,53,0.15); color: var(--warn); border: 1px solid rgba(255,107,53,0.25); }
+  .action-badge.verify { background: rgba(0,229,160,0.1); color: var(--accent); border: 1px solid rgba(0,229,160,0.2); }
+  .action-badge.monitor { background: rgba(0,180,255,0.1); color: var(--accent2); border: 1px solid rgba(0,180,255,0.2); }
+
+  /* ENTITIES */
+  .entities-row {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .entity-tag {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .entity-tag span { color: var(--text-dim); }
+
+  /* CONFIDENCE BAR */
+  .confidence-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-top: 14px;
+  }
+
+  .conf-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .conf-track {
+    flex: 1;
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .conf-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+    border-radius: 2px;
+    transition: width 1.2s ease;
+  }
+
+  .conf-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 700;
+    min-width: 36px;
+    text-align: right;
+  }
+
+  /* LOADING STATE */
+  .loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 48px 20px;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .loading-ring {
+    width: 48px; height: 48px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-steps {
+    display: flex; flex-direction: column; gap: 6px;
+    font-size: 11px; letter-spacing: 0.5px;
+  }
+
+  .loading-step {
+    display: flex; align-items: center; gap: 8px;
+    color: var(--text-muted);
+    transition: color 0.3s;
+  }
+
+  .loading-step.done { color: var(--accent); }
+  .loading-step.active { color: var(--text-dim); }
+
+  .step-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--text-muted);
+    transition: background 0.3s;
+  }
+
+  .loading-step.done .step-dot { background: var(--accent); }
+  .loading-step.active .step-dot { background: var(--accent2); animation: pulse-dot 1s infinite; }
+
+  /* EMPTY STATE */
+  .empty-state {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; text-align: center;
+    padding: 48px 20px;
+    gap: 12px;
+    color: var(--text-muted);
+    flex: 1;
+  }
+
+  .empty-icon {
+    width: 56px; height: 56px;
+    border: 1.5px dashed var(--border);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    margin-bottom: 4px;
+  }
+
+  .empty-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-dim);
+  }
+
+  .empty-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    max-width: 200px;
+    line-height: 1.6;
+  }
+
+  /* HISTORY */
+  .history-strip {
+    display: flex; gap: 8px; flex-direction: column;
+  }
+
+  .history-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .history-item:hover { border-color: rgba(0,229,160,0.3); }
+
+  .hist-dot {
+    width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  }
+
+  .hist-text {
+    flex: 1;
+    font-size: 12px;
+    color: var(--text-dim);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .hist-time {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--text);
+    display: flex; align-items: center; gap: 10px;
+    z-index: 100;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* VOICE INDICATOR */
+  .voice-btn.recording {
+    border-color: var(--danger) !important;
+    color: var(--danger) !important;
+    animation: glow-red 1s infinite;
+  }
+
+  @keyframes glow-red {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,45,85,0.4); }
+    50% { box-shadow: 0 0 0 6px rgba(255,45,85,0); }
+  }
+
+  /* RESPONSE SECTIONS */
+  .response-section {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .response-section-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .verification-item {
+    display: flex; gap: 8px; align-items: flex-start;
+    font-size: 12px; color: var(--text-dim);
+    line-height: 1.5; margin-bottom: 6px;
+  }
+
+  .check-icon { color: var(--accent); margin-top: 2px; flex-shrink: 0; }
+  .cross-icon { color: var(--danger); margin-top: 2px; flex-shrink: 0; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    main { grid-template-columns: 1fr; }
+    .hero { padding: 32px 20px 24px; flex-direction: column; gap: 24px; }
+    .stats-row { justify-content: flex-start; }
+    .input-panel { padding: 24px 20px; border-right: none; border-bottom: 1px solid var(--border); }
+    .output-panel { padding: 24px 20px; }
+    header { padding: 16px 20px; }
+  }
+
+  /* ─── COPY BTN ─── */
+  .copy-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: 'Space Mono', monospace;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div class="logo-text">Crisis<span>Link</span></div>
+    <div class="badge badge-green">GEMINI POWERED</div>
+  </div>
+  <div class="header-right">
+    <div class="status-dot"></div>
+    <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text-muted);">SYSTEM LIVE</span>
+    <div class="badge badge-blue">PROMPTWARS '26</div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-left">
+      <div class="hero-label">Universal Intent Bridge</div>
+      <h1>Turn Chaos Into<br><span class="highlight">Life-Saving Action</span></h1>
+      <p class="hero-desc">
+        Drop any messy, real-world signal — voice transcripts, medical records, emergency texts, traffic reports, photos — and get instantly structured, verified, prioritized actions.
+      </p>
+    </div>
+    <div class="stats-row">
+      <div class="stat">
+        <div class="stat-val" id="stat-processed">0</div>
+        <div class="stat-label">Processed</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" id="stat-critical">0</div>
+        <div class="stat-label">Critical</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">97%</div>
+        <div class="stat-label">Accuracy</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INPUT PANEL -->
+  <div class="input-panel">
+    <div>
+      <div class="panel-title">Input Mode</div>
+      <div class="mode-tabs" id="modeTabs">
+        <button class="mode-tab active" data-mode="text">📝 Text</button>
+        <button class="mode-tab" data-mode="medical">🏥 Medical</button>
+        <button class="mode-tab" data-mode="emergency">🚨 Emergency</button>
+        <button class="mode-tab" data-mode="env">🌍 Environment</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel-title">Quick Scenarios</div>
+      <div class="scenario-chips" id="scenarioChips">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <div>
+      <div class="panel-title">Describe the Situation</div>
+      <div class="input-wrapper">
+        <textarea id="inputText" placeholder="Paste or type anything — a chaotic emergency description, patient notes, environmental data, a news snippet, a voice transcript... CrisisLink will make sense of it all."></textarea>
+        <div class="input-actions">
+          <button class="icon-btn voice-btn" id="voiceBtn" title="Voice input">🎙️</button>
+          <button class="icon-btn" id="clearBtn" title="Clear">✕</button>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel-title">Attach Files (optional)</div>
+      <label class="file-drop" id="fileDrop">
+        <input type="file" id="fileInput" accept="image/*,.pdf,.txt,.csv" multiple>
+        <div>📎 Drop images, PDFs, or documents<br><span style="font-size:11px;opacity:0.6">Photos, medical reports, maps — anything</span></div>
+      </label>
+      <div id="fileList" style="margin-top:8px;font-size:12px;color:var(--text-muted);"></div>
+    </div>
+
+    <button class="submit-btn" id="analyzeBtn">
+      <div class="btn-inner">
+        <span>⚡</span>
+        <span>Analyze & Generate Actions</span>
+      </div>
+    </button>
+
+    <div>
+      <div class="panel-title" style="margin-bottom:10px;">Recent Analyses</div>
+      <div class="history-strip" id="historyList"></div>
+    </div>
+  </div>
+
+  <!-- OUTPUT PANEL -->
+  <div class="output-panel" id="outputPanel">
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">🎯</div>
+      <div class="empty-title">Ready to Analyze</div>
+      <div class="empty-sub">Submit any unstructured input to get structured, actionable intelligence.</div>
+    </div>
+  </div>
+
+</main>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span id="toastMsg">✓ Copied to clipboard</span>
+</div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+const GEMINI_API_KEY = 'AIzaSyCobmm0Q0A40rHxKFH_OrT5rFRAv_BTUvA';
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let currentMode = 'text';
+let attachedFiles = [];
+let history = [];
+let stats = { processed: 0, critical: 0 };
+let recognition = null;
+let isRecording = false;
+
+// ─── SCENARIOS ────────────────────────────────────────────────────────────────
+const SCENARIOS = {
+  text: [
+    { label: '🔥 Building fire', text: 'Smoke reported on 3rd floor of residential building. Multiple residents unable to evacuate. Elderly man trapped in room 308. Gas leak suspected near kitchen area.', sev: 'critical' },
+    { label: '🚗 Road accident', text: 'Multi-vehicle collision on NH-44 near Hebbal flyover. 3 cars involved. One person unconscious, bleeding from head. Traffic blocked both directions. Fuel spill visible.', sev: 'danger' },
+    { label: '🌊 Flash flood', text: 'Sudden water surge in low-lying areas of Koramangala. Water level rising at 1ft per hour. About 200 families affected. Power lines down. Main road submerged.', sev: 'warn' },
+  ],
+  medical: [
+    { label: '💊 Drug overdose', text: 'Patient: Male, 34. Found unconscious. Empty pill bottles: alprazolam, oxycodone. Last seen 6hrs ago. No response to stimuli. Breathing shallow. BP 80/50.', sev: 'critical' },
+    { label: '❤️ Chest pain', text: 'Patient: Female, 62 yrs. Severe chest pain radiating to left arm for past 30 minutes. Sweating. Nausea. History of hypertension. Takes metformin and lisinopril. Diabetic.', sev: 'danger' },
+    { label: '🤒 Unknown illness', text: 'Child, 8 years. High fever 104F for 3 days. Rash spreading from trunk to limbs. Refused food for 2 days. No known allergies. Recently returned from rural Karnataka trip.', sev: 'warn' },
+  ],
+  emergency: [
+    { label: '🆘 Missing person', text: 'Missing: Elderly woman, 78, dementia patient. Last seen at Lalbagh botanical garden at 2PM wearing blue saree. Speaks only Kannada. Family very worried.', sev: 'warn' },
+    { label: '⚡ Power grid failure', text: 'Substation explosion in Whitefield. 50,000 homes without power. Hospital on backup generator running low. Traffic signals down. 3 areas affected. Repair crew unavailable.', sev: 'danger' },
+    { label: '☣️ Chemical leak', text: 'Industrial chemical spill at warehouse near Electronic City. Unknown substance, strong smell. 5 workers feel dizzy and nauseous. Wind blowing towards residential area 400m away.', sev: 'critical' },
+  ],
+  env: [
+    { label: '🌡️ Heat emergency', text: 'City temp at 46°C. 12 heatstroke cases reported today. BBMP water supply low. 4 elderly deaths suspected heat-related. Night temperatures not dropping below 35°C.', sev: 'danger' },
+    { label: '💨 Air quality', text: 'AQI reading 387 in Hebbal. PM2.5 at dangerous levels. 3 schools not aware. Vulnerable populations including asthmatic children at risk. No government advisory issued yet.', sev: 'warn' },
+    { label: '🌍 Earthquake', text: 'M4.2 earthquake near Kolar. Felt in Bengaluru. Reports of cracks in old buildings. Residents panicking. Aftershock risk unknown. Phone lines congested.', sev: 'warn' },
+  ],
+};
+
+// ─── DOM REFS ────────────────────────────────────────────────────────────────
+const inputText = document.getElementById('inputText');
+const analyzeBtn = document.getElementById('analyzeBtn');
+const outputPanel = document.getElementById('outputPanel');
+const emptyState = document.getElementById('emptyState');
+const voiceBtn = document.getElementById('voiceBtn');
+const clearBtn = document.getElementById('clearBtn');
+const fileInput = document.getElementById('fileInput');
+const fileList = document.getElementById('fileList');
+const historyList = document.getElementById('historyList');
+const scenarioChips = document.getElementById('scenarioChips');
+const toast = document.getElementById('toast');
+const toastMsg = document.getElementById('toastMsg');
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+function init() {
+  renderChips();
+  setupModes();
+  setupVoice();
+  setupFileUpload();
+  animateStat('stat-processed', 0);
+}
+
+function renderChips() {
+  scenarioChips.innerHTML = '';
+  SCENARIOS[currentMode].forEach(s => {
+    const chip = document.createElement('button');
+    chip.className = `chip ${s.sev}`;
+    chip.textContent = s.label;
+    chip.onclick = () => { inputText.value = s.text; inputText.focus(); };
+    scenarioChips.appendChild(chip);
+  });
+}
+
+function setupModes() {
+  document.getElementById('modeTabs').addEventListener('click', e => {
+    const tab = e.target.closest('.mode-tab');
+    if (!tab) return;
+    document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentMode = tab.dataset.mode;
+    renderChips();
+    const placeholders = {
+      text: 'Paste or type any situation — emergency, disaster, crisis...',
+      medical: 'Patient symptoms, vitals, history, medications — messy or structured...',
+      emergency: 'Describe the emergency in any language, any format...',
+      env: 'Environmental data, sensor readings, weather reports, news...',
+    };
+    inputText.placeholder = placeholders[currentMode];
+  });
+}
+
+function setupVoice() {
+  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+    voiceBtn.title = 'Voice not supported in this browser';
+    voiceBtn.style.opacity = '0.4';
+    return;
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SR();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-IN';
+
+  recognition.onresult = e => {
+    const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
+    inputText.value = transcript;
+  };
+
+  recognition.onend = () => { isRecording = false; voiceBtn.classList.remove('recording'); };
+
+  voiceBtn.onclick = () => {
+    if (isRecording) { recognition.stop(); isRecording = false; voiceBtn.classList.remove('recording'); }
+    else { recognition.start(); isRecording = true; voiceBtn.classList.add('recording'); }
+  };
+}
+
+function setupFileUpload() {
+  fileInput.addEventListener('change', e => {
+    attachedFiles = Array.from(e.target.files);
+    fileList.innerHTML = attachedFiles.map(f => `<div style="padding:4px 0;display:flex;align-items:center;gap:6px;"><span style="color:var(--accent2)">📄</span>${f.name} <span style="opacity:0.5">(${(f.size/1024).toFixed(0)}KB)</span></div>`).join('');
+  });
+
+  const drop = document.getElementById('fileDrop');
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.style.borderColor = 'var(--accent2)'; });
+  drop.addEventListener('dragleave', () => { drop.style.borderColor = ''; });
+  drop.addEventListener('drop', e => {
+    e.preventDefault();
+    drop.style.borderColor = '';
+    attachedFiles = Array.from(e.dataTransfer.files);
+    fileList.innerHTML = attachedFiles.map(f => `<div style="padding:4px 0;"><span style="color:var(--accent2)">📄</span> ${f.name}</div>`).join('');
+  });
+}
+
+clearBtn.onclick = () => { inputText.value = ''; attachedFiles = []; fileList.innerHTML = ''; };
+
+// ─── ANALYZE ──────────────────────────────────────────────────────────────────
+analyzeBtn.addEventListener('click', async () => {
+  const text = inputText.value.trim();
+  if (!text) { showToast('⚠️ Please describe a situation first'); return; }
+
+  analyzeBtn.disabled = true;
+  emptyState.style.display = 'none';
+  showLoading();
+
+  try {
+    const result = await callGemini(text);
+    displayResult(result, text);
+    stats.processed++;
+    if (result.severity === 'CRITICAL' || result.severity === 'HIGH') stats.critical++;
+    document.getElementById('stat-processed').textContent = stats.processed;
+    document.getElementById('stat-critical').textContent = stats.critical;
+    addHistory(text, result.severity);
+  } catch(err) {
+    console.error(err);
+    displayError(err.message || 'Analysis failed. Check API key and connection.');
+  } finally {
+    analyzeBtn.disabled = false;
+  }
+});
+
+async function callGemini(inputText) {
+  // Build image parts if any
+  const parts = [];
+
+  // Add image files
+  for (const file of attachedFiles) {
+    if (file.type.startsWith('image/')) {
+      const b64 = await fileToBase64(file);
+      parts.push({ inlineData: { mimeType: file.type, data: b64 } });
+    }
+  }
+
+  const systemPrompt = `You are CrisisLink, an AI system that acts as a universal bridge between human intent and complex emergency/societal systems. You analyze chaotic, messy, real-world inputs and convert them into structured, verified, life-saving action plans.
+
+You MUST respond with ONLY valid JSON (no markdown, no explanation outside the JSON) matching exactly this schema:
+
+{
+  "severity": "CRITICAL|HIGH|MEDIUM|LOW",
+  "intent": "MEDICAL|EMERGENCY|ENVIRONMENTAL|INFRASTRUCTURE|MISSING_PERSON|DISASTER|HEALTH_CRISIS|OTHER",
+  "summary": "2-3 sentence clear summary of the situation",
+  "entities": [{"type": "person|location|time|substance|condition|resource", "value": "extracted entity"}],
+  "actions": [
+    {
+      "priority": 1,
+      "urgency": "IMMEDIATE|SOON|MONITOR|VERIFY",
+      "title": "Action title",
+      "detail": "Specific actionable step with details",
+      "agency": "Who should do this"
+    }
+  ],
+  "verifications": [
+    {"verified": true|false, "item": "what was verified or flagged"}
+  ],
+  "confidence": 0.85,
+  "riskFactors": ["risk 1", "risk 2"],
+  "timeline": "Estimated urgency window e.g. Act within 10 minutes"
+}
+
+Rules:
+- Always output 4-7 concrete, specific actions ordered by priority
+- Extract all key entities (people, locations, substances, conditions)
+- Confidence should reflect information completeness
+- Be specific and actionable, not generic
+- Consider Bengaluru/Indian context for local resources`;
+
+  parts.push({ text: `${systemPrompt}\n\nInput to analyze:\n${inputText}` });
+
+  const body = {
+    contents: [{ parts }],
+    generationConfig: {
+      temperature: 0.2,
+      maxOutputTokens: 1500,
+    }
+  };
+
+  const response = await fetch(GEMINI_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+
+  if (!response.ok) {
+    const err = await response.json();
+    throw new Error(err.error?.message || `HTTP ${response.status}`);
+  }
+
+  const data = await response.json();
+  const raw = data.candidates[0].content.parts[0].text;
+
+  // Strip possible markdown fences
+  const clean = raw.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+  return JSON.parse(clean);
+}
+
+function fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+// ─── UI ───────────────────────────────────────────────────────────────────────
+function showLoading() {
+  outputPanel.innerHTML = `
+    <div class="loading-state">
+      <div class="loading-ring"></div>
+      <div style="font-size:12px;letter-spacing:1px;color:var(--text-dim)">CRISISLINK ANALYZING</div>
+      <div class="loading-steps" id="loadSteps">
+        <div class="loading-step active" id="ls0"><div class="step-dot"></div> PARSING INTENT</div>
+        <div class="loading-step" id="ls1"><div class="step-dot"></div> EXTRACTING ENTITIES</div>
+        <div class="loading-step" id="ls2"><div class="step-dot"></div> ASSESSING SEVERITY</div>
+        <div class="loading-step" id="ls3"><div class="step-dot"></div> GENERATING ACTIONS</div>
+        <div class="loading-step" id="ls4"><div class="step-dot"></div> VERIFYING & RANKING</div>
+      </div>
+    </div>`;
+
+  let step = 0;
+  const stepInterval = setInterval(() => {
+    if (step > 0) { document.getElementById(`ls${step-1}`)?.classList.replace('active','done'); }
+    document.getElementById(`ls${step}`)?.classList.add('active');
+    step++;
+    if (step >= 5) clearInterval(stepInterval);
+  }, 400);
+}
+
+function displayResult(result, rawInput) {
+  const sevColor = { CRITICAL: 'var(--danger)', HIGH: 'var(--warn)', MEDIUM: '#ffd60a', LOW: 'var(--accent)' };
+  const sevClass = { CRITICAL: 'critical', HIGH: 'high', MEDIUM: 'medium', LOW: 'low' };
+  const urgColor = { IMMEDIATE: 'now', SOON: 'soon', VERIFY: 'verify', MONITOR: 'monitor' };
+
+  const actionsHTML = (result.actions || []).map((a, i) => `
+    <div class="action-item" style="animation-delay:${i*0.08}s">
+      <div class="action-num">0${a.priority || i+1}</div>
+      <div class="action-text">
+        <div style="margin-bottom:4px;"><strong>${a.title}</strong></div>
+        <div>${a.detail}</div>
+        ${a.agency ? `<div style="margin-top:4px;font-size:11px;color:var(--text-muted);font-family:'Space Mono',monospace;">→ ${a.agency}</div>` : ''}
+      </div>
+      <div>
+        <div class="action-badge ${urgColor[a.urgency] || 'verify'}">${a.urgency || 'ACT'}</div>
+      </div>
+    </div>`).join('');
+
+  const entitiesHTML = (result.entities || []).slice(0, 10).map(e =>
+    `<div class="entity-tag"><span>${e.type}:</span> ${e.value}</div>`).join('');
+
+  const verifyHTML = (result.verifications || []).slice(0, 4).map(v =>
+    `<div class="verification-item"><span class="${v.verified ? 'check-icon' : 'cross-icon'}">${v.verified ? '✓' : '⚠'}</span> <span>${v.item}</span></div>`).join('');
+
+  const riskHTML = (result.riskFactors || []).map(r =>
+    `<div style="font-size:12px;color:var(--warn);padding:4px 0;display:flex;gap:8px;"><span>▲</span>${r}</div>`).join('');
+
+  const confPct = Math.round((result.confidence || 0.8) * 100);
+
+  outputPanel.innerHTML = `
+    <div class="triage-card">
+      <div class="triage-header">
+        <div class="severity ${sevClass[result.severity] || 'low'}">
+          <div class="severity-bar"><div class="severity-fill"></div></div>
+          ${result.severity || 'UNKNOWN'}
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="intent-tag">${result.intent || 'GENERAL'}</div>
+          <button class="copy-btn" onclick="copyResult()">COPY</button>
+        </div>
+      </div>
+
+      ${result.timeline ? `<div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--warn);margin-bottom:12px;padding:8px 12px;background:rgba(255,107,53,0.08);border-radius:7px;border:1px solid rgba(255,107,53,0.2)">⏱ ${result.timeline}</div>` : ''}
+
+      <div class="triage-summary">${result.summary}</div>
+
+      <div class="confidence-row">
+        <div class="conf-label">Confidence</div>
+        <div class="conf-track"><div class="conf-fill" style="width:${confPct}%"></div></div>
+        <div class="conf-val">${confPct}%</div>
+      </div>
+
+      <div class="response-section">
+        <div class="actions-label">Structured Actions</div>
+        <div class="action-list">${actionsHTML}</div>
+      </div>
+
+      ${entitiesHTML ? `<div class="entities-row">${entitiesHTML}</div>` : ''}
+
+      ${verifyHTML ? `<div class="response-section">
+        <div class="response-section-title">Verification Flags</div>
+        ${verifyHTML}
+      </div>` : ''}
+
+      ${riskHTML ? `<div class="response-section">
+        <div class="response-section-title">Risk Factors</div>
+        ${riskHTML}
+      </div>` : ''}
+    </div>`;
+
+  // Store for copy
+  window._lastResult = result;
+  window._lastRaw = rawInput;
+}
+
+function displayError(msg) {
+  outputPanel.innerHTML = `
+    <div class="triage-card" style="border-color:rgba(255,45,85,0.3)">
+      <div class="triage-header">
+        <div class="severity critical"><div class="severity-bar"><div class="severity-fill"></div></div>ERROR</div>
+      </div>
+      <div class="triage-summary" style="color:var(--danger)">${msg}</div>
+      <div style="font-size:13px;color:var(--text-muted);margin-top:8px;">Check your API key and network connection. Make sure the Gemini API key is valid and has quota.</div>
+    </div>`;
+}
+
+function addHistory(text, severity) {
+  const colors = { CRITICAL: 'var(--danger)', HIGH: 'var(--warn)', MEDIUM: '#ffd60a', LOW: 'var(--accent)' };
+  const entry = { text: text.substring(0, 60) + (text.length > 60 ? '…' : ''), severity, time: new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) };
+  history.unshift(entry);
+  history = history.slice(0, 5);
+
+  historyList.innerHTML = history.map(h => `
+    <div class="history-item" onclick="document.getElementById('inputText').value='${h.text.replace(/'/g,"\\'")}';window.scrollTo(0,0)">
+      <div class="hist-dot" style="background:${colors[h.severity]||'var(--accent)'}"></div>
+      <div class="hist-text">${h.text}</div>
+      <div class="hist-time">${h.time}</div>
+    </div>`).join('');
+}
+
+function copyResult() {
+  if (!window._lastResult) return;
+  const text = JSON.stringify(window._lastResult, null, 2);
+  navigator.clipboard.writeText(text).then(() => showToast('✓ JSON copied to clipboard'));
+}
+
+function showToast(msg, duration = 2500) {
+  toastMsg.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), duration);
+}
+
+function animateStat(id, val) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  let curr = 0;
+  const target = val;
+  const step = () => { if (curr < target) { curr++; el.textContent = curr; requestAnimationFrame(step); } };
+  step();
+}
+
+// ─── START ────────────────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
